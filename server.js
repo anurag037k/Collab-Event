@@ -7,7 +7,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
-app.use(express.static('public'));
 
 // ✅ Using your EXACT MongoDB connection string
 const dbURI = process.env.MONGO_URI || 'mongodb+srv://vidhioraofficial_db_user:sDmZKVGDWNu4vhvL@cluster0.0angzfx.mongodb.net/bootcamp_db?retryWrites=true&w=majority';
@@ -16,7 +15,9 @@ mongoose.connect(dbURI)
     .then(() => console.log('✅ Connected to MongoDB Atlas'))
     .catch(err => console.error('❌ Database Connection Error:', err));
 
-// --- SCHEMAS ---
+// ==========================================
+// SCHEMAS
+// ==========================================
 const referralSchema = new mongoose.Schema({
     type: { type: String, enum: ['Ambassador', 'Organization'], required: true },
     name: { type: String, required: true },
@@ -40,13 +41,15 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
-// --- PUBLIC API ---
+// ==========================================
+// PUBLIC API ROUTES
+// ==========================================
 app.get('/api/event-status', async (req, res) => {
     try {
         const count = await User.countDocuments();
-        let price = 599; // Final Slab
-        if (count < 10) price = 449; // Early Bird
-        else if (count < 40) price = 499; // Regular Phase
+        let price = 599; 
+        if (count < 10) price = 449; 
+        else if (count < 40) price = 499; 
 
         const referrals = await Referral.find({ isActive: true }).select('name code type');
         res.json({ count, price, referrals });
@@ -87,7 +90,36 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// --- ADMIN API ---
+// ==========================================
+// 🔒 ADMIN SECURITY LOCK
+// ==========================================
+const adminAuth = (req, res, next) => {
+    const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
+    const [username, password] = Buffer.from(b64auth, 'base64').toString().split(':');
+
+    // Default Credentials (you can change these!)
+    const ADMIN_USER = process.env.ADMIN_USER || 'vidhiora';
+    const ADMIN_PASS = process.env.ADMIN_PASS || 'bootcamp2026';
+
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+        return next(); // Correct credentials, grant access
+    }
+
+    // Incorrect credentials, trigger browser login prompt
+    res.set('WWW-Authenticate', 'Basic realm="Bootcamp Admin Panel"');
+    res.status(401).send('Access Denied: Authentication required.');
+};
+
+// 1. Lock the admin HTML file specifically
+app.use('/admin.html', adminAuth);
+
+// 2. Lock all admin database actions
+app.use('/api/admin', adminAuth);
+
+
+// ==========================================
+// SECURED ADMIN API ROUTES
+// ==========================================
 app.get('/api/admin/users', async (req, res) => {
     const users = await User.find().sort({ registrationDate: -1 });
     res.json(users);
@@ -96,6 +128,16 @@ app.get('/api/admin/users', async (req, res) => {
 app.post('/api/admin/users/:id/approve', async (req, res) => {
     await User.findByIdAndUpdate(req.params.id, { status: "Confirmed" });
     res.json({ success: true });
+});
+
+// New Route: Delete/Remove User
+app.delete('/api/admin/users/:id', async (req, res) => {
+    try {
+        await User.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to delete user." });
+    }
 });
 
 app.get('/api/admin/referrals', async (req, res) => {
@@ -122,5 +164,11 @@ app.put('/api/admin/referrals/:id', async (req, res) => {
     await Referral.findByIdAndUpdate(req.params.id, { isActive: req.body.isActive });
     res.json({ success: true });
 });
+
+
+// ==========================================
+// 🚀 PUBLIC FILES (MUST BE AT THE VERY BOTTOM)
+// ==========================================
+app.use(express.static('public'));
 
 app.listen(PORT, () => console.log(`🚀 Bootcamp Server running on port ${PORT}`));
