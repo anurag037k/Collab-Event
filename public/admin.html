@@ -13,10 +13,10 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
         th { background: #f8fafc; color: #475569; }
-        .btn { padding: 8px 14px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; font-size: 13px;}
-        .btn-green { background: #10b981; } .btn-red { background: #ef4444; } .btn-blue { background: #2563eb; }
+        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; font-size: 12px; display: inline-block;}
+        .btn-green { background: #10b981; } .btn-orange { background: #f97316; } .btn-red { background: #ef4444; } .btn-blue { background: #2563eb; }
         .form-row { display: flex; gap: 10px; margin-bottom: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
         .form-row input, .form-row select { padding: 10px; flex: 1; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px; }
     </style>
@@ -34,9 +34,7 @@
     <!-- USERS TAB -->
     <div id="users" class="tab-content active">
         <table>
-            <thead>
-                <tr><th>#</th><th>Name / Contact</th><th>College</th><th>Referral Code</th><th>Paid</th><th>UTR</th><th>Status</th><th>Action</th></tr>
-            </thead>
+            <thead><tr><th>#</th><th>Name / Contact</th><th>College</th><th>Referral Code</th><th>Paid</th><th>UTR</th><th>Status</th><th>Action</th></tr></thead>
             <tbody id="userTable"></tbody>
         </table>
     </div>
@@ -44,18 +42,13 @@
     <!-- REFERRALS TAB -->
     <div id="referrals" class="tab-content">
         <div class="form-row">
-            <select id="newType">
-                <option value="Ambassador">Campus Ambassador</option>
-                <option value="Organization">Organization</option>
-            </select>
+            <select id="newType"><option value="Ambassador">Campus Ambassador</option><option value="Organization">Organization</option></select>
             <input type="text" id="newName" placeholder="Full Name">
             <input type="text" id="newCode" placeholder="Unique Code (e.g. CA01)">
-            <button class="btn btn-blue" onclick="addReferral()">+ Add Entity</button>
+            <button class="btn btn-blue" onclick="addReferral()" style="padding: 10px 15px; font-size: 14px;">+ Add Entity</button>
         </div>
         <table>
-            <thead>
-                <tr><th>Type</th><th>Name</th><th>Code</th><th>Successful Referrals</th><th>Total Earnings (₹25/ref)</th><th>Status</th><th>Actions</th></tr>
-            </thead>
+            <thead><tr><th>Type</th><th>Name</th><th>Code</th><th>Successful Referrals</th><th>Total Earnings (₹25/ref)</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="refTable"></tbody>
         </table>
     </div>
@@ -76,6 +69,25 @@
         tbody.innerHTML = '';
         users.forEach(u => {
             const isPending = u.status === 'Pending';
+            const isRejected = u.status === 'Rejected';
+            const isConfirmed = u.status === 'Confirmed';
+            
+            let statusColor = isPending ? '#f59e0b' : (isRejected ? '#ef4444' : '#10b981');
+            
+            let actionBtns = '';
+            if (isPending) {
+                actionBtns = `
+                    <button class="btn btn-green" onclick="approveUser('${u._id}')" style="margin-bottom: 5px;">Approve</button>
+                    <button class="btn btn-orange" onclick="rejectUser('${u._id}')" style="margin-bottom: 5px;">Reject</button><br>
+                `;
+            } else if (isConfirmed) {
+                actionBtns = `<span style="color:#10b981; font-weight:bold; display:block; margin-bottom:5px;">Approved ✓</span>`;
+            } else if (isRejected) {
+                actionBtns = `<span style="color:#ef4444; font-weight:bold; display:block; margin-bottom:5px;">Rejected ✕</span>`;
+            }
+            
+            actionBtns += `<button class="btn btn-red" style="font-size: 11px; padding: 4px 8px; margin-top: 5px;" onclick="deleteUser('${u._id}')">Remove Data</button>`;
+
             tbody.innerHTML += `
                 <tr>
                     <td>${u.registrationNumber}</td>
@@ -84,17 +96,33 @@
                     <td><strong style="color:#2563eb">${u.referralCode}</strong></td>
                     <td><strong>₹${u.amountPaid}</strong></td>
                     <td><code style="background:#f1f5f9; padding:2px 6px; border-radius:4px;">${u.transactionId}</code></td>
-                    <td style="color:${isPending ? '#ef4444' : '#10b981'}; font-weight: bold;">${u.status}</td>
-                    <td>${isPending ? `<button class="btn btn-green" onclick="approveUser('${u._id}')">Approve Payment</button>` : '<span style="color:#10b981; font-weight:bold;">Approved ✓</span>'}</td>
+                    <td style="color:${statusColor}; font-weight: bold;">${u.status}</td>
+                    <td>${actionBtns}</td>
                 </tr>`;
         });
     }
 
     async function approveUser(id) {
-        if(confirm("Confirm payment received? This will credit the ambassador if a code was used.")) {
+        if(confirm("Confirm payment received? This will count them towards the 50 seats.")) {
             await fetch(`/api/admin/users/${id}/approve`, { method: 'POST' });
             loadUsers();
-            loadReferrals(); // Auto-update the earnings tab!
+            loadReferrals(); 
+        }
+    }
+
+    async function rejectUser(id) {
+        if(confirm("Are you sure you want to REJECT this payment? They will not take up a seat limit.")) {
+            await fetch(`/api/admin/users/${id}/reject`, { method: 'POST' });
+            loadUsers();
+            loadReferrals(); 
+        }
+    }
+
+    async function deleteUser(id) {
+        if(confirm("Are you sure you want to completely REMOVE this registration data from the database?")) {
+            await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+            loadUsers();
+            loadReferrals(); 
         }
     }
 
@@ -112,51 +140,25 @@
                     <td><strong>${r.totalUses}</strong> Users</td>
                     <td style="color: #10b981; font-weight: bold; font-size: 16px;">₹${r.totalEarnings}</td>
                     <td style="color:${r.isActive ? '#10b981' : '#ef4444'}; font-weight:bold;">${r.isActive ? 'Active' : 'Inactive'}</td>
-                    <td>
-                        <button class="btn ${r.isActive ? 'btn-red' : 'btn-green'}" onclick="toggleStatus('${r._id}', ${!r.isActive})">
-                            ${r.isActive ? 'Deactivate' : 'Activate'}
-                        </button>
-                    </td>
+                    <td><button class="btn ${r.isActive ? 'btn-red' : 'btn-green'}" style="padding: 8px 12px;" onclick="toggleStatus('${r._id}', ${!r.isActive})">${r.isActive ? 'Deactivate' : 'Activate'}</button></td>
                 </tr>`;
         });
     }
 
     async function addReferral() {
-        const payload = {
-            type: document.getElementById('newType').value,
-            name: document.getElementById('newName').value,
-            code: document.getElementById('newCode').value
-        };
-        if(!payload.name || !payload.code) return alert("Please fill all fields.");
-
-        const res = await fetch('/api/admin/referrals', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        
-        const result = await res.json();
-        if(result.success) {
-            document.getElementById('newName').value = '';
-            document.getElementById('newCode').value = '';
-            loadReferrals();
-        } else {
-            alert(result.message || "Failed to add entity.");
-        }
+        const payload = { type: document.getElementById('newType').value, name: document.getElementById('newName').value, code: document.getElementById('newCode').value };
+        if(!payload.name || !payload.code) return alert("Fill all fields.");
+        const res = await fetch('/api/admin/referrals', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if((await res.json()).success) { document.getElementById('newName').value = ''; document.getElementById('newCode').value = ''; loadReferrals(); }
     }
 
     async function toggleStatus(id, isActive) {
-        await fetch(`/api/admin/referrals/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ isActive })
-        });
+        await fetch(`/api/admin/referrals/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isActive }) });
         loadReferrals();
     }
 
     loadUsers();
     loadReferrals();
 </script>
-
 </body>
 </html>

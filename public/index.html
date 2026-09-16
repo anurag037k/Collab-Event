@@ -13,7 +13,6 @@
         .main-wrapper { max-width: 1000px; width: 100%; background: var(--card); border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); display: flex; overflow: hidden; flex-direction: row; }
         @media (max-width: 768px) { .main-wrapper { flex-direction: column; } }
 
-        /* Left Side: Information */
         .info-panel { background: var(--primary); color: white; padding: 40px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .info-panel h1 { font-size: 28px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; color: #ffffff; }
         .info-panel .subtitle { font-size: 15px; color: #94a3b8; font-weight: 500; margin-bottom: 30px; letter-spacing: 0.5px; text-transform: uppercase; }
@@ -23,7 +22,6 @@
         .pricing-tier .price { font-size: 36px; font-weight: 800; }
         .pricing-tier .seats { font-size: 13px; font-weight: 500; background: rgba(0,0,0,0.2); display: inline-block; padding: 4px 12px; border-radius: 20px; margin-top: 8px; }
 
-        /* Right Side: Form */
         .form-panel { padding: 40px; flex: 1.2; background: white; }
         .form-panel h2 { color: var(--primary); font-size: 20px; margin-bottom: 25px; font-weight: 700; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
         
@@ -35,13 +33,11 @@
         input { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--primary); transition: all 0.2s; background: #f8fafc; }
         input:focus { outline: none; border-color: var(--accent); background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
         
-        /* Premium Referral Input */
         .referral-group { display: flex; gap: 10px; }
         .apply-btn { padding: 0 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
         .apply-btn:hover { background: #000; }
         #refMessage { font-size: 13px; font-weight: 600; margin-top: 8px; display: none; }
 
-        /* Payment Section */
         .payment-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center; }
         .payment-box h4 { color: var(--primary); font-size: 16px; margin-bottom: 15px; }
         .qr-placeholder { width: 160px; height: 160px; background: white; border: 2px dashed #cbd5e1; margin: 0 auto 15px; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
@@ -59,7 +55,6 @@
 <body>
 
 <div class="main-wrapper" id="mainWrapper">
-    <!-- Left Info Panel -->
     <div class="info-panel">
         <div>
             <h1>National Bootcamp on Cyber Law & Security</h1>
@@ -75,7 +70,6 @@
         </div>
     </div>
 
-    <!-- Right Form Panel -->
     <div class="form-panel">
         <h2>Participant Registration</h2>
         <form id="regForm">
@@ -104,23 +98,18 @@
                         <button type="button" class="apply-btn" onclick="applyReferral()">Apply</button>
                     </div>
                     <div id="refMessage"></div>
-                    <!-- Hidden field to send with form submission -->
                     <input type="hidden" name="referralCode" id="finalReferralCode" value="NONE">
                 </div>
             </div>
 
             <div class="payment-box">
                 <h4>Secure Payment Gateway</h4>
-                
-                <!-- Display QR Code for PC Users -->
                 <div class="qr-placeholder">
-                    <!-- Ensure you upload your image as qr.png in the public folder -->
+                    <!-- ADD YOUR QR IMAGE FILE HERE AS qr.png -->
                     <img src="qr.png" alt="Scan to Pay" onerror="this.style.display='none'; this.parentNode.innerHTML='<span style=\'font-size:12px; color:#94a3b8;\'>qr.png not found</span>';">
                 </div>
-                
                 <div class="upi-id-box">UPI ID: anurag037k@ptyes</div>
                 
-                <!-- Direct link for Mobile Users -->
                 <a href="#" id="upiBtn" class="mobile-pay-btn">Pay ₹<span class="payAmountBtn">...</span> via Mobile App</a>
                 <div class="mobile-notice">*Mobile App button works on smartphones only. PC users, please scan the QR code.</div>
             </div>
@@ -140,7 +129,6 @@
     let finalPrice = 599;
     let activeCodes = [];
 
-    // Initialize Page
     async function init() {
         try {
             const res = await fetch('/api/event-status');
@@ -158,23 +146,19 @@
             basePrice = data.price;
             finalPrice = basePrice;
             
-            // Set pricing text
             let phase = data.count < 10 ? "EARLY BIRD PHASE" : (data.count < 40 ? "REGULAR REGISTRATION" : "FINAL SLAB");
             let limitTxt = data.count < 10 ? "Fast filling — 10 Seats" : (data.count < 40 ? "Next 30 Seats" : "Last 10 Seats");
             
             document.getElementById('phaseText').innerText = phase;
             document.getElementById('seatsText').innerText = limitTxt;
             
-            // Store active referral codes to check against when user clicks "Apply"
             activeCodes = data.referrals.map(ref => ref.code.toUpperCase());
-            
             updateCheckoutUI();
         } catch (error) {
             console.error("Failed to fetch event status");
         }
     }
 
-    // Handle Manual Referral Application
     function applyReferral() {
         const inputField = document.getElementById('referralInput');
         const code = inputField.value.trim().toUpperCase();
@@ -182,60 +166,39 @@
         const hiddenField = document.getElementById('finalReferralCode');
 
         if (!code) {
-            msgBox.style.display = 'block';
-            msgBox.style.color = '#ef4444';
-            msgBox.innerText = 'Please enter a code first.';
+            msgBox.style.display = 'block'; msgBox.style.color = '#ef4444'; msgBox.innerText = 'Please enter a code first.';
             return;
         }
 
         if (activeCodes.includes(code)) {
-            // Success
-            msgBox.style.display = 'block';
-            msgBox.style.color = '#10b981';
-            msgBox.innerText = '🎉 Code applied! 10% Discount unlocked.';
-            inputField.style.borderColor = '#10b981';
-            inputField.readOnly = true; // Lock the input
-            hiddenField.value = code; // Send this to backend
-            
+            msgBox.style.display = 'block'; msgBox.style.color = '#10b981'; msgBox.innerText = '🎉 Code applied! 10% Discount unlocked.';
+            inputField.style.borderColor = '#10b981'; inputField.readOnly = true; hiddenField.value = code; 
             finalPrice = Math.round(basePrice * 0.90);
             updateCheckoutUI();
         } else {
-            // Failed
-            msgBox.style.display = 'block';
-            msgBox.style.color = '#ef4444';
-            msgBox.innerText = '❌ Invalid or inactive code.';
-            inputField.style.borderColor = '#ef4444';
-            hiddenField.value = 'NONE';
-            
+            msgBox.style.display = 'block'; msgBox.style.color = '#ef4444'; msgBox.innerText = '❌ Invalid or inactive code.';
+            inputField.style.borderColor = '#ef4444'; hiddenField.value = 'NONE';
             finalPrice = basePrice;
             updateCheckoutUI();
         }
     }
 
-    // Update UI Prices and UPI Intent
     function updateCheckoutUI() {
         document.getElementById('displayPrice').innerText = finalPrice;
         document.querySelector('.payAmountBtn').innerText = finalPrice;
-        
-        const upiLink = `upi://pay?pa=anurag037k@ptyes&pn=Anurag%20Kumar&am=${finalPrice}&cu=INR`;
-        document.getElementById('upiBtn').href = upiLink;
+        document.getElementById('upiBtn').href = `upi://pay?pa=anurag037k@ptyes&pn=Anurag%20Kumar&am=${finalPrice}&cu=INR`;
     }
 
-    // Handle Form Submission
     document.getElementById('regForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
-        btn.disabled = true;
-        btn.innerText = "Processing Details...";
+        btn.disabled = true; btn.innerText = "Processing Details...";
 
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
+        const data = Object.fromEntries(new FormData(e.target).entries());
 
         try {
             const res = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
             });
             const result = await res.json();
             
@@ -249,17 +212,14 @@
                     </div>`;
             } else {
                 alert(result.message || "Failed to register.");
-                btn.disabled = false;
-                btn.innerText = "Complete Registration & Verify";
+                btn.disabled = false; btn.innerText = "Complete Registration & Verify";
             }
         } catch (error) {
             alert("A network error occurred. Please try again.");
-            btn.disabled = false;
-            btn.innerText = "Complete Registration & Verify";
+            btn.disabled = false; btn.innerText = "Complete Registration & Verify";
         }
     });
 
-    // Start Page
     init();
 </script>
 </body>
