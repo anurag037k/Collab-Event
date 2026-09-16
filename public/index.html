@@ -4,142 +4,262 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>National Bootcamp on Cyber Law & Cyber Security</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0f172a; --accent: #2563eb; --bg: #f8fafc; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 40px 20px; margin: 0; }
-        .container { background: white; max-width: 600px; width: 100%; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .header { text-align: center; margin-bottom: 25px; }
-        .header h1 { font-size: 22px; color: var(--primary); margin: 0 0 5px 0; }
-        .header p { font-size: 14px; color: #64748b; margin: 0; font-weight: bold; }
-        .banner { background: linear-gradient(135deg, #10b981, #34d399); color: white; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
-        .banner h2 { margin: 0 0 5px 0; font-size: 24px; }
-        .about-org { background: #f1f5f9; padding: 15px; border-radius: 8px; font-size: 13px; color: #475569; margin-bottom: 20px; border-left: 4px solid var(--accent); line-height: 1.5; }
-        .pay-btn { display: block; background: #16a34a; color: white; text-align: center; padding: 15px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 18px; margin: 20px 0; transition: 0.2s; }
-        .pay-btn:hover { background: #15803d; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: var(--primary); }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        .submit-btn { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        #discountNote { display: none; color: #16a34a; font-weight: bold; font-size: 13px; text-align: center; margin-top: -10px; margin-bottom: 15px; }
+        :root { --primary: #0f172a; --secondary: #334155; --accent: #2563eb; --accent-hover: #1d4ed8; --success: #10b981; --bg: #f3f4f6; --card: #ffffff; --border: #e5e7eb; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--secondary); line-height: 1.6; display: flex; justify-content: center; padding: 40px 20px; min-height: 100vh; align-items: flex-start; }
+        
+        .main-wrapper { max-width: 1000px; width: 100%; background: var(--card); border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); display: flex; overflow: hidden; flex-direction: row; }
+        @media (max-width: 768px) { .main-wrapper { flex-direction: column; } }
+
+        /* Left Side: Information */
+        .info-panel { background: var(--primary); color: white; padding: 40px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .info-panel h1 { font-size: 28px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; color: #ffffff; }
+        .info-panel .subtitle { font-size: 15px; color: #94a3b8; font-weight: 500; margin-bottom: 30px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .collab-box { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; font-size: 14px; color: #e2e8f0; margin-bottom: 30px; border-left: 4px solid var(--accent); }
+        .pricing-tier { background: linear-gradient(135deg, #10b981, #059669); padding: 20px; border-radius: 12px; text-align: center; margin-top: auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .pricing-tier h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; opacity: 0.9; }
+        .pricing-tier .price { font-size: 36px; font-weight: 800; }
+        .pricing-tier .seats { font-size: 13px; font-weight: 500; background: rgba(0,0,0,0.2); display: inline-block; padding: 4px 12px; border-radius: 20px; margin-top: 8px; }
+
+        /* Right Side: Form */
+        .form-panel { padding: 40px; flex: 1.2; background: white; }
+        .form-panel h2 { color: var(--primary); font-size: 20px; margin-bottom: 25px; font-weight: 700; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .full-width { grid-column: span 2; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
+        
+        label { display: block; font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 6px; }
+        input { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--primary); transition: all 0.2s; background: #f8fafc; }
+        input:focus { outline: none; border-color: var(--accent); background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        
+        /* Premium Referral Input */
+        .referral-group { display: flex; gap: 10px; }
+        .apply-btn { padding: 0 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .apply-btn:hover { background: #000; }
+        #refMessage { font-size: 13px; font-weight: 600; margin-top: 8px; display: none; }
+
+        /* Payment Section */
+        .payment-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center; }
+        .payment-box h4 { color: var(--primary); font-size: 16px; margin-bottom: 15px; }
+        .qr-placeholder { width: 160px; height: 160px; background: white; border: 2px dashed #cbd5e1; margin: 0 auto 15px; border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .qr-placeholder img { width: 100%; height: 100%; object-fit: contain; }
+        .upi-id-box { background: white; border: 1px solid var(--border); display: inline-block; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; color: var(--primary); margin-bottom: 15px; }
+        .mobile-pay-btn { display: block; background: #10b981; color: white; text-decoration: none; padding: 14px; border-radius: 8px; font-weight: 700; font-size: 16px; transition: 0.2s; }
+        .mobile-pay-btn:hover { background: #059669; }
+        .mobile-notice { font-size: 12px; color: #64748b; margin-top: 8px; }
+
+        .submit-btn { width: 100%; padding: 16px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); }
+        .submit-btn:hover { background: var(--accent-hover); box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
+        .submit-btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
     </style>
 </head>
 <body>
 
-<div class="container" id="regView">
-    <div class="header">
-        <h1>National Bootcamp on Cyber Law & Cyber Security</h1>
-        <p>Organised by Vidhiora × LEGEX LEO</p>
+<div class="main-wrapper" id="mainWrapper">
+    <!-- Left Info Panel -->
+    <div class="info-panel">
+        <div>
+            <h1>National Bootcamp on Cyber Law & Security</h1>
+            <div class="subtitle">Organised by Vidhiora × LEGEX LEO</div>
+            <div class="collab-box">
+                <strong>Partnership Context:</strong> LEGEX LEO is a premier legal education platform founded by Adv. Khushi Aggarwal. This intensive bootcamp bridges the critical gap between theoretical legal education and practical cyber law application.
+            </div>
+        </div>
+        <div class="pricing-tier" id="priceBanner">
+            <h3 id="phaseText">Loading...</h3>
+            <div class="price">₹<span id="displayPrice">...</span></div>
+            <div class="seats" id="seatsText">Checking availability...</div>
+        </div>
     </div>
 
-    <div class="banner" id="priceBanner"><h2>Loading Tier...</h2></div>
+    <!-- Right Form Panel -->
+    <div class="form-panel">
+        <h2>Participant Registration</h2>
+        <form id="regForm">
+            <div class="form-grid">
+                <div class="full-width">
+                    <label>Full Legal Name</label>
+                    <input type="text" name="fullName" placeholder="e.g. Anurag Kumar" required>
+                </div>
+                <div>
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="name@example.com" required>
+                </div>
+                <div>
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone" placeholder="+91 XXXXX XXXXX" required>
+                </div>
+                <div class="full-width">
+                    <label>College / Institution</label>
+                    <input type="text" name="college" placeholder="Name of your University" required>
+                </div>
+                
+                <div class="full-width">
+                    <label>Campus Ambassador Code (Optional)</label>
+                    <div class="referral-group">
+                        <input type="text" id="referralInput" placeholder="Enter referral code for 10% OFF" style="text-transform: uppercase;">
+                        <button type="button" class="apply-btn" onclick="applyReferral()">Apply</button>
+                    </div>
+                    <div id="refMessage"></div>
+                    <!-- Hidden field to send with form submission -->
+                    <input type="hidden" name="referralCode" id="finalReferralCode" value="NONE">
+                </div>
+            </div>
 
-    <div class="about-org">
-        <strong>About Collaboration:</strong> LEGEX LEO is a premier legal education and professional learning platform founded by Adv. Khushi Aggarwal. Partnering with Vidhiora, this bootcamp bridges the gap between theoretical legal education and practical cyber law skills.
+            <div class="payment-box">
+                <h4>Secure Payment Gateway</h4>
+                
+                <!-- Display QR Code for PC Users -->
+                <div class="qr-placeholder">
+                    <!-- Ensure you upload your image as qr.png in the public folder -->
+                    <img src="qr.png" alt="Scan to Pay" onerror="this.style.display='none'; this.parentNode.innerHTML='<span style=\'font-size:12px; color:#94a3b8;\'>qr.png not found</span>';">
+                </div>
+                
+                <div class="upi-id-box">UPI ID: anurag037k@ptyes</div>
+                
+                <!-- Direct link for Mobile Users -->
+                <a href="#" id="upiBtn" class="mobile-pay-btn">Pay ₹<span class="payAmountBtn">...</span> via Mobile App</a>
+                <div class="mobile-notice">*Mobile App button works on smartphones only. PC users, please scan the QR code.</div>
+            </div>
+
+            <div class="full-width" style="margin-bottom: 25px;">
+                <label>Payment Reference Number (12-Digit UTR)</label>
+                <input type="text" name="transactionId" placeholder="e.g. 312345678901" required maxlength="12" pattern="\d{12}" title="Must be exactly 12 digits">
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn">Complete Registration & Verify</button>
+        </form>
     </div>
-
-    <form id="regForm">
-        <div class="form-group"><label>Full Name</label><input type="text" name="fullName" required></div>
-        <div class="form-group"><label>Email</label><input type="email" name="email" required></div>
-        <div class="form-group"><label>Phone</label><input type="text" name="phone" required></div>
-        <div class="form-group"><label>College/Institution</label><input type="text" name="college" required></div>
-        
-        <div class="form-group">
-            <label>Campus Ambassador Code (Get 10% OFF)</label>
-            <select name="referralCode" id="refSelect">
-                <option value="NONE">None (Direct Registration)</option>
-            </select>
-        </div>
-
-        <p style="text-align: center; font-size: 14px; color: #666; margin-top: 25px;">Step 1: Click below to pay directly via your UPI App.</p>
-        <a href="#" id="upiBtn" class="pay-btn">Pay Now via UPI App</a>
-        <div id="discountNote">🎉 10% Discount Applied Successfully!</div>
-        <p style="text-align: center; font-size: 12px; color: #999;">If on PC, scan QR or pay manually to: <strong>anurag037k@ptyes</strong></p>
-        
-        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-
-        <div class="form-group">
-            <label>UPI Transaction ID (12-digit UTR)</label>
-            <input type="text" name="transactionId" required maxlength="12" placeholder="e.g. 312345678901">
-        </div>
-        
-        <button type="submit" class="submit-btn" id="submitBtn">Submit Registration</button>
-    </form>
 </div>
 
 <script>
     let basePrice = 599;
+    let finalPrice = 599;
+    let activeCodes = [];
 
+    // Initialize Page
     async function init() {
-        const res = await fetch('/api/event-status');
-        const data = await res.json();
-        
-        if(data.count >= 50) {
-            document.getElementById('regView').innerHTML = `
-                <div class="header"><h1>National Bootcamp on Cyber Law</h1><p>Vidhiora × LEGEX LEO</p></div>
-                <h2 style="color:#ef4444;text-align:center;">Registration Closed</h2>
-                <p style="text-align:center;color:#64748b;">All 50 seats have been successfully filled.</p>`;
+        try {
+            const res = await fetch('/api/event-status');
+            const data = await res.json();
+            
+            if(data.count >= 50) {
+                document.getElementById('mainWrapper').innerHTML = `
+                    <div style="padding: 60px; text-align: center; width: 100%;">
+                        <h1 style="color:#0f172a; margin-bottom:15px;">Registration Closed</h1>
+                        <p style="color:#64748b; font-size:16px;">All 50 seats for the National Bootcamp have been successfully filled. Thank you for your incredible response!</p>
+                    </div>`;
+                return;
+            }
+
+            basePrice = data.price;
+            finalPrice = basePrice;
+            
+            // Set pricing text
+            let phase = data.count < 10 ? "EARLY BIRD PHASE" : (data.count < 40 ? "REGULAR REGISTRATION" : "FINAL SLAB");
+            let limitTxt = data.count < 10 ? "Fast filling — 10 Seats" : (data.count < 40 ? "Next 30 Seats" : "Last 10 Seats");
+            
+            document.getElementById('phaseText').innerText = phase;
+            document.getElementById('seatsText').innerText = limitTxt;
+            
+            // Store active referral codes to check against when user clicks "Apply"
+            activeCodes = data.referrals.map(ref => ref.code.toUpperCase());
+            
+            updateCheckoutUI();
+        } catch (error) {
+            console.error("Failed to fetch event status");
+        }
+    }
+
+    // Handle Manual Referral Application
+    function applyReferral() {
+        const inputField = document.getElementById('referralInput');
+        const code = inputField.value.trim().toUpperCase();
+        const msgBox = document.getElementById('refMessage');
+        const hiddenField = document.getElementById('finalReferralCode');
+
+        if (!code) {
+            msgBox.style.display = 'block';
+            msgBox.style.color = '#ef4444';
+            msgBox.innerText = 'Please enter a code first.';
             return;
         }
 
-        basePrice = data.price;
-        let phase = data.count < 10 ? "EARLY BIRD" : (data.count < 40 ? "REGULAR PHASE" : "FINAL SLAB");
-        let limitTxt = data.count < 10 ? "Only 10 Seats" : (data.count < 40 ? "Next 30 Seats" : "Last 10 Seats");
-
-        document.getElementById('priceBanner').innerHTML = `<h2>${phase} — ₹${basePrice}</h2><div style="font-size:13px; opacity: 0.9;">${limitTxt}</div>`;
-        
-        const refSelect = document.getElementById('refSelect');
-        data.referrals.forEach(ref => {
-            const opt = document.createElement('option');
-            opt.value = ref.code;
-            opt.innerText = `${ref.name} (${ref.type})`;
-            refSelect.appendChild(opt);
-        });
-        updateCheckoutUI();
-    }
-
-    function updateCheckoutUI() {
-        const refVal = document.getElementById('refSelect').value;
-        let finalPrice = basePrice;
-        let discountNote = document.getElementById('discountNote');
-        
-        if (refVal !== 'NONE') {
+        if (activeCodes.includes(code)) {
+            // Success
+            msgBox.style.display = 'block';
+            msgBox.style.color = '#10b981';
+            msgBox.innerText = '🎉 Code applied! 10% Discount unlocked.';
+            inputField.style.borderColor = '#10b981';
+            inputField.readOnly = true; // Lock the input
+            hiddenField.value = code; // Send this to backend
+            
             finalPrice = Math.round(basePrice * 0.90);
-            discountNote.style.display = 'block';
+            updateCheckoutUI();
         } else {
-            discountNote.style.display = 'none';
+            // Failed
+            msgBox.style.display = 'block';
+            msgBox.style.color = '#ef4444';
+            msgBox.innerText = '❌ Invalid or inactive code.';
+            inputField.style.borderColor = '#ef4444';
+            hiddenField.value = 'NONE';
+            
+            finalPrice = basePrice;
+            updateCheckoutUI();
         }
-        
-        document.getElementById('upiBtn').href = `upi://pay?pa=anurag037k@ptyes&pn=Anurag%20Kumar&am=${finalPrice}&cu=INR`;
-        document.getElementById('upiBtn').innerText = `Pay ₹${finalPrice} via UPI App`;
     }
 
-    document.getElementById('refSelect').addEventListener('change', updateCheckoutUI);
+    // Update UI Prices and UPI Intent
+    function updateCheckoutUI() {
+        document.getElementById('displayPrice').innerText = finalPrice;
+        document.querySelector('.payAmountBtn').innerText = finalPrice;
+        
+        const upiLink = `upi://pay?pa=anurag037k@ptyes&pn=Anurag%20Kumar&am=${finalPrice}&cu=INR`;
+        document.getElementById('upiBtn').href = upiLink;
+    }
 
+    // Handle Form Submission
     document.getElementById('regForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        document.getElementById('submitBtn').disabled = true;
-        document.getElementById('submitBtn').innerText = "Processing...";
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = "Processing Details...";
 
-        const data = Object.fromEntries(new FormData(e.target).entries());
-        const res = await fetch('/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        
-        if(result.success) {
-            document.getElementById('regView').innerHTML = `
-                <div class="header"><h1>National Bootcamp on Cyber Law</h1><p>Vidhiora × LEGEX LEO</p></div>
-                <h2 style="color:#10b981;text-align:center;">🎉 Registration Successful!</h2>
-                <p style="text-align:center;color:#475569;">You are Attendee #${result.registrationNumber}.<br>Our team is verifying your payment UTR.</p>`;
-        } else {
-            alert(result.message || "Failed to register.");
-            document.getElementById('submitBtn').disabled = false;
-            document.getElementById('submitBtn').innerText = "Submit Registration";
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            
+            if(result.success) {
+                document.getElementById('mainWrapper').innerHTML = `
+                    <div style="padding: 60px; text-align: center; width: 100%;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">✅</div>
+                        <h1 style="color:#10b981; margin-bottom:10px;">Registration Successful!</h1>
+                        <p style="color:#64748b; font-size:16px;">You are confirmed as <strong>Attendee #${result.registrationNumber}</strong>.</p>
+                        <p style="color:#64748b; font-size:14px; margin-top: 15px;">Our team will verify your UTR reference shortly. You will receive an email confirmation once approved.</p>
+                    </div>`;
+            } else {
+                alert(result.message || "Failed to register.");
+                btn.disabled = false;
+                btn.innerText = "Complete Registration & Verify";
+            }
+        } catch (error) {
+            alert("A network error occurred. Please try again.");
+            btn.disabled = false;
+            btn.innerText = "Complete Registration & Verify";
         }
     });
 
+    // Start Page
     init();
 </script>
 </body>
