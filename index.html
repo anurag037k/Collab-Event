@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Bootcamp on Cyber Law & Cyber Security</title>
+    <style>
+        :root { --primary: #0f172a; --accent: #2563eb; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 40px 20px; margin: 0; }
+        .container { background: white; max-width: 600px; width: 100%; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { font-size: 22px; color: var(--primary); margin: 0 0 5px 0; }
+        .header p { font-size: 14px; color: #64748b; margin: 0; font-weight: bold; }
+        .banner { background: linear-gradient(135deg, #10b981, #34d399); color: white; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+        .banner h2 { margin: 0 0 5px 0; font-size: 24px; }
+        .about-org { background: #f1f5f9; padding: 15px; border-radius: 8px; font-size: 13px; color: #475569; margin-bottom: 20px; border-left: 4px solid var(--accent); line-height: 1.5; }
+        .pay-btn { display: block; background: #16a34a; color: white; text-align: center; padding: 15px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 18px; margin: 20px 0; transition: 0.2s; }
+        .pay-btn:hover { background: #15803d; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: var(--primary); }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        #discountNote { display: none; color: #16a34a; font-weight: bold; font-size: 13px; text-align: center; margin-top: -10px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="regView">
+    <div class="header">
+        <h1>National Bootcamp on Cyber Law & Cyber Security</h1>
+        <p>Organised by Vidhiora × LEGEX LEO</p>
+    </div>
+
+    <div class="banner" id="priceBanner"><h2>Loading Tier...</h2></div>
+
+    <div class="about-org">
+        <strong>About Collaboration:</strong> LEGEX LEO is a premier legal education and professional learning platform founded by Adv. Khushi Aggarwal. Partnering with Vidhiora, this bootcamp bridges the gap between theoretical legal education and practical cyber law skills.
+    </div>
+
+    <form id="regForm">
+        <div class="form-group"><label>Full Name</label><input type="text" name="fullName" required></div>
+        <div class="form-group"><label>Email</label><input type="email" name="email" required></div>
+        <div class="form-group"><label>Phone</label><input type="text" name="phone" required></div>
+        <div class="form-group"><label>College/Institution</label><input type="text" name="college" required></div>
+        
+        <div class="form-group">
+            <label>Campus Ambassador Code (Get 10% OFF)</label>
+            <select name="referralCode" id="refSelect">
+                <option value="NONE">None (Direct Registration)</option>
+            </select>
+        </div>
+
+        <p style="text-align: center; font-size: 14px; color: #666; margin-top: 25px;">Step 1: Click below to pay directly via your UPI App.</p>
+        <a href="#" id="upiBtn" class="pay-btn">Pay Now via UPI App</a>
+        <div id="discountNote">🎉 10% Discount Applied Successfully!</div>
+        <p style="text-align: center; font-size: 12px; color: #999;">If on PC, scan QR or pay manually to: <strong>anurag037k@ptyes</strong></p>
+        
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+        <div class="form-group">
+            <label>UPI Transaction ID (12-digit UTR)</label>
+            <input type="text" name="transactionId" required maxlength="12" placeholder="e.g. 312345678901">
+        </div>
+        
+        <button type="submit" class="submit-btn" id="submitBtn">Submit Registration</button>
+    </form>
+</div>
+
+<script>
+    let basePrice = 599;
+
+    async function init() {
+        const res = await fetch('/api/event-status');
+        const data = await res.json();
+        
+        if(data.count >= 50) {
+            document.getElementById('regView').innerHTML = `
+                <div class="header"><h1>National Bootcamp on Cyber Law</h1><p>Vidhiora × LEGEX LEO</p></div>
+                <h2 style="color:#ef4444;text-align:center;">Registration Closed</h2>
+                <p style="text-align:center;color:#64748b;">All 50 seats have been successfully filled.</p>`;
+            return;
+        }
+
+        basePrice = data.price;
+        let phase = data.count < 10 ? "EARLY BIRD" : (data.count < 40 ? "REGULAR PHASE" : "FINAL SLAB");
+        let limitTxt = data.count < 10 ? "Only 10 Seats" : (data.count < 40 ? "Next 30 Seats" : "Last 10 Seats");
+
+        document.getElementById('priceBanner').innerHTML = `<h2>${phase} — ₹${basePrice}</h2><div style="font-size:13px; opacity: 0.9;">${limitTxt}</div>`;
+        
+        const refSelect = document.getElementById('refSelect');
+        data.referrals.forEach(ref => {
+            const opt = document.createElement('option');
+            opt.value = ref.code;
+            opt.innerText = `${ref.name} (${ref.type})`;
+            refSelect.appendChild(opt);
+        });
+        updateCheckoutUI();
+    }
+
+    function updateCheckoutUI() {
+        const refVal = document.getElementById('refSelect').value;
+        let finalPrice = basePrice;
+        let discountNote = document.getElementById('discountNote');
+        
+        if (refVal !== 'NONE') {
+            finalPrice = Math.round(basePrice * 0.90);
+            discountNote.style.display = 'block';
+        } else {
+            discountNote.style.display = 'none';
+        }
+        
+        document.getElementById('upiBtn').href = `upi://pay?pa=anurag037k@ptyes&pn=Anurag%20Kumar&am=${finalPrice}&cu=INR`;
+        document.getElementById('upiBtn').innerText = `Pay ₹${finalPrice} via UPI App`;
+    }
+
+    document.getElementById('refSelect').addEventListener('change', updateCheckoutUI);
+
+    document.getElementById('regForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').innerText = "Processing...";
+
+        const data = Object.fromEntries(new FormData(e.target).entries());
+        const res = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        
+        if(result.success) {
+            document.getElementById('regView').innerHTML = `
+                <div class="header"><h1>National Bootcamp on Cyber Law</h1><p>Vidhiora × LEGEX LEO</p></div>
+                <h2 style="color:#10b981;text-align:center;">🎉 Registration Successful!</h2>
+                <p style="text-align:center;color:#475569;">You are Attendee #${result.registrationNumber}.<br>Our team is verifying your payment UTR.</p>`;
+        } else {
+            alert(result.message || "Failed to register.");
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').innerText = "Submit Registration";
+        }
+    });
+
+    init();
+</script>
+</body>
+</html>
